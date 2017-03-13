@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 9a5a1bc475c52455f883baed08ef337c
+timeCreated: 1487567050
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 40
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Monofett
+  fontNames:
+  - Monofett
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

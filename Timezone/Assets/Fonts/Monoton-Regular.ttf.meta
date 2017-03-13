@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: ffe6868189dcf4312aac9d409c993d90
+timeCreated: 1487371315
+licenseType: Free
+TrueTypeFontImporter:
+  serializedVersion: 4
+  fontSize: 40
+  forceTextureCase: -2
+  characterSpacing: 0
+  characterPadding: 1
+  includeFontData: 1
+  fontName: Monoton
+  fontNames:
+  - Monoton
+  fallbackFontReferences: []
+  customCharacters: 
+  fontRenderingMode: 0
+  ascentCalculationMode: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
