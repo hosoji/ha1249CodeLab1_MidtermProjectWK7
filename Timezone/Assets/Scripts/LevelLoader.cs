@@ -44,6 +44,18 @@ public class LevelLoader : MonoBehaviour {
 
 					cloud.transform.position = new Vector3(xPos + offsetX, yPos + offsetY, 0);
 				}
+
+				if (line [xPos] == 'U') {
+					GameObject cloud = Instantiate(Resources.Load("Cloud") as GameObject);
+
+					cloud.transform.parent = levelHolder.transform;
+
+					cloud.transform.position = new Vector3(xPos + offsetX, yPos + offsetY, 0);
+
+					cloud.GetComponent<SpriteRenderer> ().flipY = true;
+
+
+				}
 			}
 			yPos--;
 		}

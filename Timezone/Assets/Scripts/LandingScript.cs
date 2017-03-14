@@ -44,12 +44,14 @@ public class LandingScript : MonoBehaviour {
 
 		if (Input.GetKey (KeyCode.Space)) {
 			rb.constraints = RigidbodyConstraints2D.FreezePositionY;
+			GameManager.instance.Fuel -= GameManager.instance.baseFuelCost;
 		} else {
 			rb.constraints = RigidbodyConstraints2D.None;
 		}
 
 		if (Input.GetKey (KeyCode.Z)) {
 			rb.AddForce (liftAmount, ForceMode2D.Impulse);
+			GameManager.instance.Fuel -= GameManager.instance.baseFuelCost;
 		}
 		
 	}

@@ -29,6 +29,9 @@ public class PlayerControlPhysics : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+//		if (transform.position.x >= 96|| transform.position.x < -96) {
+//			transform.position = new Vector3 (transform.position.x * -1, transform.position.y, transform.position.z);
+//		}
 
 
 		if (GameManager.instance.Fuel > 0) {

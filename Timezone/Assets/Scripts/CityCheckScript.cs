@@ -11,6 +11,7 @@ public class CityCheckScript : MonoBehaviour {
 
 	[SerializeField] float timeOverCity = 0f; // Time hovering over a city
 	[SerializeField] Image progressImage; // assign in the inspector
+	[SerializeField] GameObject bg;
 
 	RaycastHit2D rayHit;
 
@@ -19,6 +20,7 @@ public class CityCheckScript : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		cityName = textUI.GetComponent<Text> ();
+		bg.SetActive(false);
 	}
 
 	// Update is called once per frame
@@ -32,10 +34,12 @@ public class CityCheckScript : MonoBehaviour {
 		if (rayHit.collider != null && rayHit.collider.tag == "City") {
 //			Debug.Log ("City in range: " + rayHit.transform.name);
 			IdentifyCity ();
+			bg.SetActive(true);  //Enables color area for text box background
 
 				
 		} else {
 			cityName.text = null;
+			bg.SetActive(false);
 		}
 
 		if (overCity == true) {
@@ -73,6 +77,7 @@ public class CityCheckScript : MonoBehaviour {
 
 //			Debug.Log ("Close");
 			cityName.text = rayHit.transform.name.ToString ();
+			
 	}
 		
 }
