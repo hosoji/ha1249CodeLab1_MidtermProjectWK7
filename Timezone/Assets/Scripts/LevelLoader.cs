@@ -56,6 +56,17 @@ public class LevelLoader : MonoBehaviour {
 
 
 				}
+
+				if (line [xPos] == 'W') {
+					GameObject water = Instantiate(Resources.Load("Water") as GameObject);
+
+					water.transform.parent = levelHolder.transform;
+
+					water.transform.position = new Vector3(xPos + offsetX, yPos + offsetY, 0);
+
+
+
+				}
 			}
 			yPos--;
 		}

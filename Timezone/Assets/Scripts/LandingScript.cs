@@ -6,29 +6,27 @@ public class LandingScript : MonoBehaviour {
 
 	Rigidbody2D rb;
 
+	TakeoffScript takeOff;
+
 	public Vector2 forceAmount;
 	public Vector2 liftAmount;
 
-	float brakeFactor = 0f;
+	float landingPoints = 0;
 
-	private float brakeAmount;
-	public float BrakeAmount {
-		get{
-			return brakeAmount;
-		}
-		set{
-			brakeAmount = value;
-		}
-	}
+	const float BRAKE_FACTOR = 0.1f;
+
+	bool hasBegun = false;
 
 	// Use this for initialization
 	void Start () {
+
+
+		takeOff = GetComponent<TakeoffScript> ();
 		rb = GetComponent<Rigidbody2D> ();
 		rb.isKinematic = true;
 
-		Invoke ("DescendPlane", 2f);
+		Invoke ("StartLevel", 2f);
 
-		brakeAmount = 0.1f;
 	}
 
 	// Update is called once per frame
@@ -36,54 +34,63 @@ public class LandingScript : MonoBehaviour {
 
 		//To Center Camera
 		Camera.main.transform.position = new Vector3 (transform.position.x, transform.position.y, -1);
+		rb.constraints = RigidbodyConstraints2D.None;
 
-//		if (Input.GetKeyDown (KeyCode.B)) {
-//			brakeAmount = brakeAmount * brakeFactor;
-//			ApplyBrakes (brakeAmount);
+//		if (Input.GetKey (KeyCode.Z)) {
+//			rb.constraints = RigidbodyConstraints2D.FreezePositionY;
+//			GameManager.instance.Fuel -= GameManager.instance.baseFuelCost;
+//		} else {
+//			rb.constraints = RigidbodyConstraints2D.None;
 //		}
 
 		if (Input.GetKey (KeyCode.Space)) {
-			rb.constraints = RigidbodyConstraints2D.FreezePositionY;
-			GameManager.instance.Fuel -= GameManager.instance.baseFuelCost;
-		} else {
-			rb.constraints = RigidbodyConstraints2D.None;
-		}
-
-		if (Input.GetKey (KeyCode.Z)) {
 			rb.AddForce (liftAmount, ForceMode2D.Impulse);
 			GameManager.instance.Fuel -= GameManager.instance.baseFuelCost;
 		}
-		
-	}
 
-	void DescendPlane(){
+		// This code is for checking player velocity to end landing scene when velocity is 0
+
+		float rv;
+		rv = rb.velocity.magnitude;
+		if (rv > 0) {
+			hasBegun = true;	
+		}
+
+		if(rv < BRAKE_FACTOR) {
+			rb.velocity = new Vector2(0, 0);
+		}
+
+//		Debug.Log ("Velocity: " + rv);
+		if (Mathf.Approximately (rv, 0)) {
+			if (hasBegun) {
+				Invoke("EndLandingSequence", 5);
+			}
+		}
+
+	}
+		
+
+	void StartLevel(){
 		rb.isKinematic = false;
 		rb.AddForce (forceAmount, ForceMode2D.Impulse);
 	}
-
-	void ApplyBrakes(float b){
-		rb.drag = b;
-		
-	}
-
-	public void OnTriggerEnter2D (Collider2D other){
-
-//
-//		if (other.tag == "Correct") {
-//			brakeFactor = 2.5f;
-//		}
-//		else if (other.tag == "Incorrect"){
-//			brakeFactor = 0f;
-//		}
-	}
 		
 
-//	public void OnTriggerExit2D (Collider2D other){
-//
-//
-//		if (other.tag == "Landing Cue") {
-//			brakeFactor = 0f;
-//		}
-//	}
+	public void OnTriggerStay2D (Collider2D other){
+
+
+		if (other.tag == "Landing Cue") {
+			landingPoints++;
+//			Debug.Log ("Landing Points: " + landingPoints);
+		}
+
+	}
+
+	void EndLandingSequence (){
+
+		// This code gets called when velocity is 0 (after scene has begun)
+		takeOff.isReady = true;
+		Destroy (this);
+	}
 
 }

@@ -40,14 +40,25 @@ public class UtilScript : MonoBehaviour {
 
 		GameObject conditionObject = Instantiate (Resources.Load (conditionName) as GameObject);
 		conditionObject.transform.position = city.transform.position;
-			for (int i = 0; i < amount; i++) {
-				GameObject type = Instantiate (Resources.Load (typeName) as GameObject);
-				type.transform.parent = conditionObject.transform;
-				Vector2 original = conditionObject.transform.position;
-				type.transform.position = original + Random.insideUnitCircle * 4;
 
-			}
+		for (int i = 0; i < amount; i++) {
+			GameObject type = Instantiate (Resources.Load (typeName) as GameObject);
+			type.transform.parent = conditionObject.transform;
+			Vector2 original = conditionObject.transform.position;
+			type.transform.position = original + Random.insideUnitCircle * 4;
+
+		}
 			
+	}
+
+	public static void SaveTransformPosition(Transform t, string path, string name) {
+
+		const char DELIMITER = '|';
+
+		Vector3 transformPos = t.position;
+		string content = "" + transformPos.x + DELIMITER + transformPos.y + DELIMITER + transformPos.z; 
+
+		WriteStringToFile (path, name, content);
 	}
 
 

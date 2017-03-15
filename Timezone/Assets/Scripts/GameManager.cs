@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 using System.Net;
 using SimpleJSON;
@@ -14,13 +15,19 @@ public class GameManager : MonoBehaviour {
 
 	public GameObject canvas;
 	public GameObject canvasFuel;
+	public GameObject textUI;
+	public GameObject bg;
+
 	Text myText;
 	Text fuelText;
+	public Text cityName;
 
 	float hrs;
 	float mins;
 
 	int num;
+
+	public int days = 0;
 
 	const int HOURS_MAX = 24;
 	const int MINS_MAX = 60;
@@ -51,9 +58,11 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
+	int timeMod = 5;
 
 	// Use this for initialization
 	void Start () {
+
 
 		if(instance == null){
 			instance = this;
@@ -61,6 +70,9 @@ public class GameManager : MonoBehaviour {
 		} else {
 			Destroy(gameObject);
 		}
+
+		cityName = textUI.GetComponent<Text> ();
+		bg.SetActive(false);
 	
 		myText = canvas.GetComponent<Text> ();
 		fuelText = canvasFuel.GetComponent<Text> ();
@@ -86,12 +98,22 @@ public class GameManager : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+		Scene currentScene = SceneManager.GetActiveScene();
+		string sceneName = currentScene.name;
+
 //		hrs = (hrs + Time.deltaTime/100);
-		mins = (mins + Time.deltaTime * 20);
-//		Debug.Log (hrs);
+		if (sceneName == "Main") {
+			mins = (mins + Time.deltaTime * (timeMod * 4));
+		} else {
+			mins = (mins + Time.deltaTime * timeMod);
+		}
+	
+
+		Debug.Log ("days: " + days);
 
 		if (hrs >= HOURS_MAX) {
 			Reset (hrs, 1);
+			days++;
 		}
 
 		if (mins >= MINS_MAX) {
@@ -119,6 +141,7 @@ public class GameManager : MonoBehaviour {
 		}
 
 	}
+		
 
 	public string CheckCityWeather(string city){
 
@@ -150,7 +173,7 @@ public class GameManager : MonoBehaviour {
 		string[] thunder = {"1", "3", "4", "37", "38", "39", "45", "47"};
 		string[] cloudy = {"26", "27", "28", "29", "30", "44"}; 
 		string[] rainy = { "5", "9", "10", "11", "12", "17", "35", "40", "46"};
-		Debug.Log (city.name + ": " + weather);
+//		Debug.Log (city.name + ": " + weather);
 
 		for ( int i =0; i < thunder.Length; i++){
 			if (weather == thunder [i]) {

@@ -6,52 +6,54 @@ using UnityEngine.SceneManagement;
 
 public class CityCheckScript : MonoBehaviour {
 
-	public GameObject textUI;
-	Text cityName;
-
-	[SerializeField] float timeOverCity = 0f; // Time hovering over a city
-	[SerializeField] Image progressImage; // assign in the inspector
-	[SerializeField] GameObject bg;
+	public string fileName;
 
 	RaycastHit2D rayHit;
 
+	[SerializeField] float timeOverCity = 0f; // Time hovering over a city
+	[SerializeField] Image progressImage; // assign in the inspector
+
 	bool overCity = false;
+
+	private const float DIST_RAY = 8f;
 
 	// Use this for initialization
 	void Start () {
-		cityName = textUI.GetComponent<Text> ();
-		bg.SetActive(false);
+
 	}
 
 	// Update is called once per frame
 	void Update () {
 
-//		Ray2D ray = new Ray2D(transform.position, transform.forward);
 
-		rayHit = Physics2D.Raycast (transform.position, transform.up, 8f);
+		rayHit = Physics2D.Raycast (transform.position, transform.up, DIST_RAY);
 
 			 
 		if (rayHit.collider != null && rayHit.collider.tag == "City") {
 //			Debug.Log ("City in range: " + rayHit.transform.name);
-			IdentifyCity ();
-			bg.SetActive(true);  //Enables color area for text box background
+			if (!overCity) {
+				IdentifyCity ();
+				GameManager.instance.bg.SetActive (true);
+			}   //Enables color area for text box background
 
 				
 		} else {
-			cityName.text = null;
-			bg.SetActive(false);
+			if (!overCity) {
+				GameManager.instance.cityName.text = null;
+				GameManager.instance.bg.SetActive (false);
+			}
 		}
 
 		if (overCity == true) {
-//			Debug.Log ("Plane over City");
 			timeOverCity = Mathf.Clamp01 (timeOverCity + Time.deltaTime); //After 1sec this variable will be one
 
 			if (timeOverCity == 1f) {
+				UtilScript.SaveTransformPosition (this.transform, Application.dataPath, fileName);
 				SceneManager.LoadScene (1);
 				timeOverCity = 0;
 			}
 
-		} else{
+		} else {
 			timeOverCity = Mathf.Clamp01 (timeOverCity - Time.deltaTime);
 		}
 
@@ -61,9 +63,11 @@ public class CityCheckScript : MonoBehaviour {
 	public void OnTriggerEnter2D (Collider2D other){
 
 		if (other.tag == "City") {
-			Debug.Log ("Land at " + other.name);
-
+			GameManager.instance.cityName.text = other.name.ToString ();
+			GameManager.instance.bg.SetActive (true);
 			overCity = true;
+
+			Debug.Log ("Land at " + other.name);
 		}
 	}
 
@@ -75,8 +79,7 @@ public class CityCheckScript : MonoBehaviour {
 	}
 	public void IdentifyCity(){
 
-//			Debug.Log ("Close");
-			cityName.text = rayHit.transform.name.ToString ();
+		GameManager.instance.cityName.text = rayHit.transform.name.ToString ();
 			
 	}
 		

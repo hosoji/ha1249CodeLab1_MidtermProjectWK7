@@ -11,7 +11,7 @@ public class LoadCityWeather : MonoBehaviour {
 		
 		for (int i = 0; i < cities.Length; i++) {
 			string c = cities [i].name.ToString ();
-			Debug.Log (GameManager.instance.CheckCityWeather (c));
+//			Debug.Log (GameManager.instance.CheckCityWeather (c));
 
 		}
 	}

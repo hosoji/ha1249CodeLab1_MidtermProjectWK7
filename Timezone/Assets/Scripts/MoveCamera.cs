@@ -15,7 +15,7 @@ public class MoveCamera : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-
+		Camera.main.transform.position = new Vector3 (player.position.x, player.position.y, Camera.main.transform.position.z);
 	}
 	
 	// Update is called once per frame
