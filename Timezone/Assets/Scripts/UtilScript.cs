@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO;
 using SimpleJSON;
+using UnityEngine.SceneManagement;
 
 public class UtilScript : MonoBehaviour {
 
@@ -60,6 +61,7 @@ public class UtilScript : MonoBehaviour {
 
 		WriteStringToFile (path, name, content);
 	}
+		
 
 
 }

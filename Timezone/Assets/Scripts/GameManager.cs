@@ -107,6 +107,11 @@ public class GameManager : MonoBehaviour {
 		} else {
 			mins = (mins + Time.deltaTime * timeMod);
 		}
+
+		if (Fuel == FUEL_MIN) {
+			SceneManager.LoadScene (0);
+			Destroy (gameObject);
+		}
 	
 
 		Debug.Log ("days: " + days);
@@ -172,7 +177,7 @@ public class GameManager : MonoBehaviour {
 
 		string[] thunder = {"1", "3", "4", "37", "38", "39", "45", "47"};
 		string[] cloudy = {"26", "27", "28", "29", "30", "44"}; 
-		string[] rainy = { "5", "9", "10", "11", "12", "17", "35", "40", "46"};
+		string[] rainy = { "5", "9", "10", "11", "12", "17", "35", "40", "46", "32", "33"};
 //		Debug.Log (city.name + ": " + weather);
 
 		for ( int i =0; i < thunder.Length; i++){

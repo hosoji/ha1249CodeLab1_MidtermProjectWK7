@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LandingScript : MonoBehaviour {
 
@@ -11,7 +12,11 @@ public class LandingScript : MonoBehaviour {
 	public Vector2 forceAmount;
 	public Vector2 liftAmount;
 
-	float landingPoints = 0;
+	float rotationAmount = 0.5f;
+	float rotationLimit = 0.4f;
+
+
+	float contactCounter = 0;
 
 	const float BRAKE_FACTOR = 0.1f;
 
@@ -42,6 +47,10 @@ public class LandingScript : MonoBehaviour {
 //		} else {
 //			rb.constraints = RigidbodyConstraints2D.None;
 //		}
+		print(transform.rotation.z);
+		if (transform.rotation.z > rotationLimit) {
+			SceneManager.LoadScene (1);
+		}
 
 		if (Input.GetKey (KeyCode.Space)) {
 			rb.AddForce (liftAmount, ForceMode2D.Impulse);
@@ -80,8 +89,9 @@ public class LandingScript : MonoBehaviour {
 
 
 		if (other.tag == "Landing Cue") {
-			landingPoints++;
-//			Debug.Log ("Landing Points: " + landingPoints);
+			contactCounter++;
+			transform.Rotate (0, 0, rotationAmount);
+			Debug.Log ("Contact counter: " + contactCounter );
 		}
 
 	}

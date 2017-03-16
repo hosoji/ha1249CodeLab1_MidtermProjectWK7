@@ -10,13 +10,18 @@ public class LevelLoader : MonoBehaviour {
 	public float offsetY = 0;
 
 	public string[] fileNames;
-	public static int levelNum = 0;
+	public static int levelNum;
 
 	// initializatize level
 	void Start () {
+
+		levelNum = Random.Range (0, 2);
+//		levelNum = 0;
 		string fileName = fileNames[levelNum];
 
-		string filePath = Application.dataPath + "/" + fileName;
+		string filePath = Application.dataPath +"/"+ fileName;
+
+//		TextAsset textFile = (TextAsset)Resources.Load(fileName) as TextAsset; 
 
 		StreamReader sr = new StreamReader(filePath);
 

@@ -28,7 +28,7 @@ public class TakeoffScript : MonoBehaviour {
 	void Update () {
 		Vector2 playerScreenPos = Camera.main.WorldToViewportPoint (transform.position);
 
-		if (playerScreenPos.x < -1) {
+		if (playerScreenPos.x < -0.15) {
 			SceneManager.LoadScene (0);
 		}
 
