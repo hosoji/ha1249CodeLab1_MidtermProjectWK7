@@ -13,10 +13,13 @@ public class LandingScript : MonoBehaviour {
 	public Vector2 liftAmount;
 
 	float rotationAmount = 0.5f;
-	float rotationLimit = 0.4f;
+	float rotationLimit1 = 45;
+	float rotationLimit2 = 350;
 
 
 	float contactCounter = 0;
+
+	float yLimit = 10;
 
 	const float BRAKE_FACTOR = 0.1f;
 
@@ -47,9 +50,19 @@ public class LandingScript : MonoBehaviour {
 //		} else {
 //			rb.constraints = RigidbodyConstraints2D.None;
 //		}
-		print(transform.rotation.z);
-		if (transform.rotation.z > rotationLimit) {
-			SceneManager.LoadScene (1);
+//		print(transform.rotation.z);
+//		print(transform.rotation.eulerAngles.z);
+		if (transform.rotation.eulerAngles.z > rotationLimit1 && transform.rotation.eulerAngles.z < rotationLimit2) {
+			Debug.Log ("Rotation limit reached");
+			GameManager.instance.StartCoroutine("ReloadOnDeath", "Lost Control");
+		}
+//		if (transform.rotation.z > rotationLimit) {
+//			Debug.Log ("Rotation limit reached");
+//			GameManager.instance.StartCoroutine("ReloadOnDeath", "Lost Control");
+//		}
+
+		if (transform.position.y > yLimit) {
+			GameManager.instance.StartCoroutine("ReloadOnDeath", "Landing Aborted");
 		}
 
 		if (Input.GetKey (KeyCode.Space)) {
@@ -91,7 +104,8 @@ public class LandingScript : MonoBehaviour {
 		if (other.tag == "Landing Cue") {
 			contactCounter++;
 			transform.Rotate (0, 0, rotationAmount);
-			Debug.Log ("Contact counter: " + contactCounter );
+//			Debug.Log ("Contact counter: " + contactCounter );
+//			Debug.Log("Rotation: " + transform.rotation);
 		}
 
 	}

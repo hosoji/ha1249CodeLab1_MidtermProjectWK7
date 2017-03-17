@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
-
+using UnityStandardAssets.ImageEffects;
 using System.Net;
 using SimpleJSON;
 
 public class GameManager : MonoBehaviour {
 
 	public static GameManager instance;
+
+	VignetteAndChromaticAberration vignette;
 
 	public GameObject [] cities;
 
@@ -63,7 +65,6 @@ public class GameManager : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 
-
 		if(instance == null){
 			instance = this;
 			DontDestroyOnLoad(this);
@@ -109,8 +110,7 @@ public class GameManager : MonoBehaviour {
 		}
 
 		if (Fuel == FUEL_MIN) {
-			SceneManager.LoadScene (0);
-			Destroy (gameObject);
+			StartCoroutine (ReloadOnDeath("Out of Fuel"));
 		}
 	
 
@@ -150,15 +150,15 @@ public class GameManager : MonoBehaviour {
 
 	public string CheckCityWeather(string city){
 
-		JSONClass json = new JSONClass();
-		
-		UtilScript.WriteStringToFile (Application.dataPath, "file.json", json.ToString ());
+//		JSONClass json = new JSONClass();
+//		
+//		UtilScript.WriteStringToFile (Application.dataPath, "file.json", json.ToString ());
 
 
-		string result = UtilScript.ReadStringFromFile (Application.dataPath, "file.json");
-
-		JSONNode readJSON = JSON.Parse (result);
-
+//		string result = UtilScript.ReadStringFromFile (Application.dataPath, "file.json");
+//
+//		JSONNode readJSON = JSON.Parse (result);
+//
 
 		WebClient client = new WebClient ();
 
@@ -198,5 +198,21 @@ public class GameManager : MonoBehaviour {
 			}
 		}
 			
+	}
+
+	public IEnumerator ReloadOnDeath(string reason){
+
+		cityName.text = reason;
+
+		float fadeFactor = 0.01f;
+
+		vignette =  Camera.main.GetComponent<VignetteAndChromaticAberration> ();
+
+		vignette.intensity = Mathf.Clamp01(vignette.intensity += fadeFactor);
+
+		yield return new WaitForSeconds(2f);
+
+		SceneManager.LoadScene (0);
+		Destroy (gameObject);
 	}
 }
