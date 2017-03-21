@@ -5,9 +5,13 @@ using UnityEngine.SceneManagement;
 
 public class LandingScript : MonoBehaviour {
 
+
 	Rigidbody2D rb;
 
 	TakeoffScript takeOff;
+
+	public ParticleSystem ps;
+
 
 	public Vector2 forceAmount;
 	public Vector2 liftAmount;
@@ -16,18 +20,29 @@ public class LandingScript : MonoBehaviour {
 	float rotationLimit1 = 45;
 	float rotationLimit2 = 350;
 
+	float topOfScreen = 10;
+	float endOfScreen = 196;
 
-	float contactCounter = 0;
 
-	float yLimit = 10;
+	float contactCounter = 1;
+
+	float points, finalPoints;
+
+	public float landingBasePoints;
+
+	float landingModifier = 1f;
+
+	public float rankTop, rankMid, rankLow;
 
 	const float BRAKE_FACTOR = 0.1f;
 
+
+
 	bool hasBegun = false;
+	bool pointsCalculated = false;
 
 	// Use this for initialization
 	void Start () {
-
 
 		takeOff = GetComponent<TakeoffScript> ();
 		rb = GetComponent<Rigidbody2D> ();
@@ -39,6 +54,13 @@ public class LandingScript : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
+
+		float pointModY = -10f;
+		float timeMod = 0.5f;
+
+		points = ((transform.position.y * pointModY) / ((contactCounter) * Time.deltaTime) ) * Time.time * timeMod ;
+
+//		Debug.Log ("Points: " + points );
 
 		//To Center Camera
 		Camera.main.transform.position = new Vector3 (transform.position.x, transform.position.y, -1);
@@ -56,12 +78,12 @@ public class LandingScript : MonoBehaviour {
 			Debug.Log ("Rotation limit reached");
 			GameManager.instance.StartCoroutine("ReloadOnDeath", "Lost Control");
 		}
-//		if (transform.rotation.z > rotationLimit) {
-//			Debug.Log ("Rotation limit reached");
-//			GameManager.instance.StartCoroutine("ReloadOnDeath", "Lost Control");
-//		}
 
-		if (transform.position.y > yLimit) {
+		if (transform.position.x >= endOfScreen) {
+			GameManager.instance.StartCoroutine("ReloadOnDeath", "Landing Aborted");
+		}
+			
+		if (transform.position.y > topOfScreen) {
 			GameManager.instance.StartCoroutine("ReloadOnDeath", "Landing Aborted");
 		}
 
@@ -72,8 +94,7 @@ public class LandingScript : MonoBehaviour {
 
 		// This code is for checking player velocity to end landing scene when velocity is 0
 
-		float rv;
-		rv = rb.velocity.magnitude;
+		float rv = rb.velocity.magnitude;
 		if (rv > 0) {
 			hasBegun = true;	
 		}
@@ -85,7 +106,10 @@ public class LandingScript : MonoBehaviour {
 //		Debug.Log ("Velocity: " + rv);
 		if (Mathf.Approximately (rv, 0)) {
 			if (hasBegun) {
-				Invoke("EndLandingSequence", 5);
+				if (!pointsCalculated) {
+					CalculatePoints ();
+					Invoke ("EndLandingSequence", 5);
+				}
 			}
 		}
 
@@ -100,15 +124,61 @@ public class LandingScript : MonoBehaviour {
 
 	public void OnTriggerStay2D (Collider2D other){
 
-
 		if (other.tag == "Landing Cue") {
+			if (ps.isStopped) {
+				ps.Play ();
+			}
 			contactCounter++;
 			transform.Rotate (0, 0, rotationAmount);
 //			Debug.Log ("Contact counter: " + contactCounter );
 //			Debug.Log("Rotation: " + transform.rotation);
 		}
 
+		if (other.tag == "Water") {
+
+			GameManager.instance.StartCoroutine ("ReloadOnDeath", "Flight Lost");
+
+		}
+
+		float rv = rb.velocity.magnitude;
+
+		if (Mathf.Approximately (rv, 0)) {
+			Debug.Log ("Plane is stopped");
+			if (other.tag == "MAX") {
+				landingModifier = rankTop;
+				Debug.Log ("Multipler: " + landingModifier);
+			}
+			else if(other.tag == "MID"){
+				landingModifier = rankMid;
+				Debug.Log ("Multipler: " + landingModifier);
+			}
+			else if(other.tag == "MIN"){
+				landingModifier = rankLow;
+				Debug.Log ("Multipler: " + landingModifier);
+			}
+
+		}
+
 	}
+
+	public void OnTriggerExit2D ( Collider2D other){
+		if (ps.isPlaying) {
+			ps.Stop ();
+		}
+	}
+
+
+
+	public void CalculatePoints(){
+
+		float offset = 0.1f;
+
+		finalPoints = ((points * offset) + landingBasePoints) * landingModifier;
+		pointsCalculated = true;
+		Debug.Log ("Final Points: " + finalPoints);
+
+	}
+
 
 	void EndLandingSequence (){
 
@@ -116,5 +186,7 @@ public class LandingScript : MonoBehaviour {
 		takeOff.isReady = true;
 		Destroy (this);
 	}
+
+
 
 }

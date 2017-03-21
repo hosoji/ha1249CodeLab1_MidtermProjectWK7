@@ -5,27 +5,28 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityStandardAssets.ImageEffects;
 using System.Net;
+using System.IO;
 using SimpleJSON;
 
 public class GameManager : MonoBehaviour {
 
 	public static GameManager instance;
 
+	//For storing Game state UI Notifications 
+	public Dictionary<string,string> phrases = new Dictionary<string, string> ();
+
+	//For access to the Image Effect
 	VignetteAndChromaticAberration vignette;
 
 	public GameObject [] cities;
 
-	public GameObject canvas;
-	public GameObject canvasFuel;
-	public GameObject textUI;
-	public GameObject bg;
+	public GameObject canvas, canvasFuel, textUI, bg;
 
-	Text myText;
-	Text fuelText;
+	Text myText, fuelText;
+
 	public Text cityName;
 
-	float hrs;
-	float mins;
+	float hrs, mins;
 
 	int num;
 
@@ -33,7 +34,6 @@ public class GameManager : MonoBehaviour {
 
 	const int HOURS_MAX = 24;
 	const int MINS_MAX = 60;
-
 
 	const int FUEL_MIN = 0;
 	public const int FUEL_MAX = 1500;
@@ -60,7 +60,10 @@ public class GameManager : MonoBehaviour {
 		}
 	}
 
+	//For having different time passage in different scenes
 	int timeMod = 5;
+
+	public string phrasesFile;
 
 	// Use this for initialization
 	void Start () {
@@ -71,6 +74,9 @@ public class GameManager : MonoBehaviour {
 		} else {
 			Destroy(gameObject);
 		}
+
+
+//		phrases.Add ();
 
 		cityName = textUI.GetComponent<Text> ();
 		bg.SetActive(false);
@@ -101,6 +107,7 @@ public class GameManager : MonoBehaviour {
 	void Update () {
 		Scene currentScene = SceneManager.GetActiveScene();
 		string sceneName = currentScene.name;
+
 
 //		hrs = (hrs + Time.deltaTime/100);
 		if (sceneName == "Main") {
@@ -137,6 +144,8 @@ public class GameManager : MonoBehaviour {
 		fuelText.text = fuel.ToString () + "F";
 	}
 
+
+
 	public void Reset(float time, int i){
 		if (time >= MINS_MAX && i == 0) {
 			mins = 0;
@@ -144,7 +153,6 @@ public class GameManager : MonoBehaviour {
 		if (time >= HOURS_MAX && i > 0) {
 			hrs = 0;
 		}
-
 	}
 		
 
@@ -175,30 +183,67 @@ public class GameManager : MonoBehaviour {
 
 	public void GetCityWeather(GameObject city, string weather ){
 
+		// Arrays of weather codes from Yahoo API
+
 		string[] thunder = {"1", "3", "4", "37", "38", "39", "45", "47"};
 		string[] cloudy = {"26", "27", "28", "29", "30", "44"}; 
 		string[] rainy = { "5", "9", "10", "11", "12", "17", "35", "40", "46", "32", "33"};
-//		Debug.Log (city.name + ": " + weather);
+
+		//		Debug.Log (city.name + ": " + weather);
 
 		for ( int i =0; i < thunder.Length; i++){
 			if (weather == thunder [i]) {
-				UtilScript.LoadCityWeather (city, "ThunderClouds", "ThunderCondition", 3);
+				LoadCityWeather (city, "ThunderClouds", "ThunderCondition", 3);
 			}
 		}
 
 		for ( int i =0; i < cloudy.Length; i++){
 			if (weather == cloudy [i]) {
-				UtilScript.LoadCityWeather (city, "CloudSprite", "CloudBase", 1);
+				LoadCityWeather (city, "CloudSprite", "CloudBase", 1);
 			}
 		}
 
 		for ( int i =0; i < rainy.Length; i++){
 			if (weather == rainy [i]) {
-				UtilScript.LoadCityWeather (city, "RainCondition", "CloudBase", 2);
+				LoadCityWeather (city, "RainCondition", "CloudBase", 2);
 			}
 		}
 			
 	}
+
+	public void LoadCityWeather(GameObject city, string typeName, string conditionName, int amount ){
+
+		GameObject conditionObject = Instantiate (Resources.Load (conditionName) as GameObject);
+		conditionObject.transform.position = city.transform.position;
+
+		for (int i = 0; i < amount; i++) {
+			GameObject type = Instantiate (Resources.Load (typeName) as GameObject);
+			type.transform.parent = conditionObject.transform;
+			Vector2 original = conditionObject.transform.position;
+			type.transform.position = original + Random.insideUnitCircle * 4;
+
+		}
+
+	}
+
+	public void LoadDictionary(){
+
+	StreamReader sr = new StreamReader(phrasesFile);
+
+	const char DELIMITER = '|';
+
+	int yPos = 0;
+
+
+	while(!sr.EndOfStream){
+		string line = sr.ReadLine();
+
+		string[] splitLine = line.Split (DELIMITER);
+		}
+		yPos++;
+
+	sr.Close();
+}
 
 	public IEnumerator ReloadOnDeath(string reason){
 
@@ -207,7 +252,6 @@ public class GameManager : MonoBehaviour {
 		float fadeFactor = 0.01f;
 
 		vignette =  Camera.main.GetComponent<VignetteAndChromaticAberration> ();
-
 		vignette.intensity = Mathf.Clamp01(vignette.intensity += fadeFactor);
 
 		yield return new WaitForSeconds(2f);
