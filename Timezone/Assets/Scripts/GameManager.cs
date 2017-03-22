@@ -12,11 +12,10 @@ public class GameManager : MonoBehaviour {
 
 	public static GameManager instance;
 
-	//For storing Game state UI Notifications 
-	public Dictionary<string,string> phrases = new Dictionary<string, string> ();
-
 	//For access to the Image Effect
 	VignetteAndChromaticAberration vignette;
+
+//	WeatherDictionary weatherType;
 
 	public GameObject [] cities;
 
@@ -36,9 +35,12 @@ public class GameManager : MonoBehaviour {
 	const int MINS_MAX = 60;
 
 	const int FUEL_MIN = 0;
-	public const int FUEL_MAX = 1500;
+	public const int FUEL_MAX = 2500;
 
 	public int baseFuelCost;
+	public int baseRefuel;
+
+	public int fuelStart;
 
 	private int fuel;
 
@@ -63,7 +65,11 @@ public class GameManager : MonoBehaviour {
 	//For having different time passage in different scenes
 	int timeMod = 5;
 
-	public string phrasesFile;
+	// Arrays of weather codes from Yahoo API
+	string[] thunderCodes = { "1", "3", "4", "37", "38", "39", "45", "47" };
+	string[] cloudyCodes = { "26", "27", "28", "29", "30", "44" };
+	string[] rainyCodes = { "5", "9", "10", "11", "12", "17", "35", "40", "46", "32", "33" };
+
 
 	// Use this for initialization
 	void Start () {
@@ -76,7 +82,6 @@ public class GameManager : MonoBehaviour {
 		}
 
 
-//		phrases.Add ();
 
 		cityName = textUI.GetComponent<Text> ();
 		bg.SetActive(false);
@@ -97,9 +102,8 @@ public class GameManager : MonoBehaviour {
 		}
 
 
-//		hourVar = System.DateTime.Now.ToString("HH:");
-//		string t = System.DateTime.Now.AddHours (2).ToString ("HH:mm");
-//		string m = System.DateTime.Now.AddHours (10).ToString ("HH:mm");
+//		weatherType = GetComponent<WeatherDictionary> ();
+			
 
 	}
 
@@ -109,7 +113,6 @@ public class GameManager : MonoBehaviour {
 		string sceneName = currentScene.name;
 
 
-//		hrs = (hrs + Time.deltaTime/100);
 		if (sceneName == "Main") {
 			mins = (mins + Time.deltaTime * (timeMod * 4));
 		} else {
@@ -183,28 +186,23 @@ public class GameManager : MonoBehaviour {
 
 	public void GetCityWeather(GameObject city, string weather ){
 
-		// Arrays of weather codes from Yahoo API
 
-		string[] thunder = {"1", "3", "4", "37", "38", "39", "45", "47"};
-		string[] cloudy = {"26", "27", "28", "29", "30", "44"}; 
-		string[] rainy = { "5", "9", "10", "11", "12", "17", "35", "40", "46", "32", "33"};
+//				Debug.Log (city.name + ": " + weather);
 
-		//		Debug.Log (city.name + ": " + weather);
-
-		for ( int i =0; i < thunder.Length; i++){
-			if (weather == thunder [i]) {
+		for ( int i =0; i < thunderCodes.Length; i++){
+			if (weather == thunderCodes [i]) {
 				LoadCityWeather (city, "ThunderClouds", "ThunderCondition", 3);
 			}
 		}
 
-		for ( int i =0; i < cloudy.Length; i++){
-			if (weather == cloudy [i]) {
+		for ( int i =0; i < cloudyCodes.Length; i++){
+			if (weather == cloudyCodes [i]) {
 				LoadCityWeather (city, "CloudSprite", "CloudBase", 1);
 			}
 		}
 
-		for ( int i =0; i < rainy.Length; i++){
-			if (weather == rainy [i]) {
+		for ( int i =0; i < rainyCodes.Length; i++){
+			if (weather == rainyCodes [i]) {
 				LoadCityWeather (city, "RainCondition", "CloudBase", 2);
 			}
 		}
@@ -225,25 +223,7 @@ public class GameManager : MonoBehaviour {
 		}
 
 	}
-
-	public void LoadDictionary(){
-
-	StreamReader sr = new StreamReader(phrasesFile);
-
-	const char DELIMITER = '|';
-
-	int yPos = 0;
-
-
-	while(!sr.EndOfStream){
-		string line = sr.ReadLine();
-
-		string[] splitLine = line.Split (DELIMITER);
-		}
-		yPos++;
-
-	sr.Close();
-}
+		
 
 	public IEnumerator ReloadOnDeath(string reason){
 

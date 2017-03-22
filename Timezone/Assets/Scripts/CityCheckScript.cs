@@ -8,6 +8,8 @@ public class CityCheckScript : MonoBehaviour {
 
 	public string fileName;
 
+	string cityWeather;
+
 	RaycastHit2D rayHit;
 
 	[SerializeField] float timeOverCity = 0f; // Time hovering over a city
@@ -34,6 +36,9 @@ public class CityCheckScript : MonoBehaviour {
 			if (!overCity) {
 				IdentifyCity ();
 				GameManager.instance.bg.SetActive (true);
+
+				string code = GameManager.instance.CheckCityWeather (rayHit.collider.name.ToString());
+
 			}   //Enables color area for text box background
 
 				

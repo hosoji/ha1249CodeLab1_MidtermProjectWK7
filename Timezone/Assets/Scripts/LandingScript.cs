@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class LandingScript : MonoBehaviour {
 
@@ -10,7 +11,11 @@ public class LandingScript : MonoBehaviour {
 
 	TakeoffScript takeOff;
 
+	public Text scoreText;
+
+
 	public ParticleSystem ps;
+	public ParticleSystem smoke;
 
 
 	public Vector2 forceAmount;
@@ -34,6 +39,7 @@ public class LandingScript : MonoBehaviour {
 
 	public float rankTop, rankMid, rankLow;
 
+
 	const float BRAKE_FACTOR = 0.1f;
 
 
@@ -48,19 +54,26 @@ public class LandingScript : MonoBehaviour {
 		rb = GetComponent<Rigidbody2D> ();
 		rb.isKinematic = true;
 
-		Invoke ("StartLevel", 2f);
+
+//		scoreText = airport.GetComponentInChildren<Text> (); 
+
+//
+//		Invoke ("StartLevel", 2f);
 
 	}
 
 	// Update is called once per frame
 	void Update () {
 
-		float pointModY = -10f;
-		float timeMod = 0.5f;
+		float pointModY = 10f;
+		float timeMod = 0.1f;
 
-		points = ((transform.position.y * pointModY) / ((contactCounter) * Time.deltaTime) ) * Time.time * timeMod ;
+		points = ((-transform.position.y * pointModY) / ((contactCounter) * Time.deltaTime) ) * Time.time * timeMod ;
 
-//		Debug.Log ("Points: " + points );
+
+		if (Input.GetKeyDown (KeyCode.Return)) {
+			StartLevel ();
+		}
 
 		//To Center Camera
 		Camera.main.transform.position = new Vector3 (transform.position.x, transform.position.y, -1);
@@ -89,7 +102,17 @@ public class LandingScript : MonoBehaviour {
 
 		if (Input.GetKey (KeyCode.Space)) {
 			rb.AddForce (liftAmount, ForceMode2D.Impulse);
+			if (transform.rotation.eulerAngles.z < 15) {
+				transform.Rotate (0, 0, rotationAmount * 0.5f);
+			}
 			GameManager.instance.Fuel -= GameManager.instance.baseFuelCost;
+			if (smoke.isStopped) {
+				smoke.Play ();
+			}
+		} else {
+			if (smoke.isPlaying) {
+				smoke.Stop ();
+			}
 		}
 
 		// This code is for checking player velocity to end landing scene when velocity is 0
@@ -101,19 +124,28 @@ public class LandingScript : MonoBehaviour {
 
 		if(rv < BRAKE_FACTOR) {
 			rb.velocity = new Vector2(0, 0);
+			if (hasBegun) {
+				Debug.Log ("Plane is stopped");
+				Debug.Log ("Multipler: " + landingModifier);
+				CalculatePoints (landingModifier);
+
+			}
+
 		}
 
 //		Debug.Log ("Velocity: " + rv);
-		if (Mathf.Approximately (rv, 0)) {
-			if (hasBegun) {
-				if (!pointsCalculated) {
-					CalculatePoints ();
-					Invoke ("EndLandingSequence", 5);
-				}
-			}
-		}
+//		if (Mathf.Approximately (rv, 0)) {
+//			if (hasBegun) {
+//				if (!pointsCalculated) {
+//					Debug.Log ("Multipler: " + landingModifier);
+//					CalculatePoints (landingModifier);
+//					Invoke ("EndLandingSequence", 5);
+//				}
+//			}
+//		}
 
 	}
+
 		
 
 	void StartLevel(){
@@ -140,23 +172,16 @@ public class LandingScript : MonoBehaviour {
 
 		}
 
-		float rv = rb.velocity.magnitude;
+		if (other.tag == "MAX") {
+			landingModifier = rankTop;
 
-		if (Mathf.Approximately (rv, 0)) {
-			Debug.Log ("Plane is stopped");
-			if (other.tag == "MAX") {
-				landingModifier = rankTop;
-				Debug.Log ("Multipler: " + landingModifier);
-			}
-			else if(other.tag == "MID"){
-				landingModifier = rankMid;
-				Debug.Log ("Multipler: " + landingModifier);
-			}
-			else if(other.tag == "MIN"){
-				landingModifier = rankLow;
-				Debug.Log ("Multipler: " + landingModifier);
-			}
+		}
+		else if(other.tag == "MID"){
+			landingModifier = rankMid;
 
+		}
+		else if(other.tag == "MIN"){
+			landingModifier = rankLow;
 		}
 
 	}
@@ -166,18 +191,28 @@ public class LandingScript : MonoBehaviour {
 			ps.Stop ();
 		}
 	}
+		
 
 
 
-	public void CalculatePoints(){
+	public void CalculatePoints(float multiplier){
 
 		float offset = 0.1f;
 
-		finalPoints = ((points * offset) + landingBasePoints) * landingModifier;
-		pointsCalculated = true;
-		Debug.Log ("Final Points: " + finalPoints);
+		if (!pointsCalculated) {
+//			Debug.Log ("Multipler: " + landingModifier);
+			finalPoints = ((points * offset) + landingBasePoints) * multiplier;
+			pointsCalculated = true;
 
+			Debug.Log ("Final Points: " + finalPoints);
+			scoreText.text = "Landing Points: " + Mathf.RoundToInt(finalPoints).ToString ();
+
+			GameManager.instance.Fuel += GameManager.instance.baseRefuel;
+			Invoke ("EndLandingSequence", 5);
+
+			}
 	}
+		
 
 
 	void EndLandingSequence (){

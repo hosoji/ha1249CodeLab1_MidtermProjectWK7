@@ -1,11 +1,14 @@
 fileFormatVersion: 2
 guid: 6f9bd2bc0e6b94e89873ac3bc1f065b6
-timeCreated: 1487994057
+timeCreated: 1490161900
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
-  executionOrder: 0
+  defaultReferences:
+  - canvas: {fileID: 1939060497076648, guid: 26773c622bdd34f39ad4324ccd343710, type: 2}
+  - ps: {instanceID: 0}
+  - smoke: {instanceID: 0}
+  executionOrder: 100
   icon: {instanceID: 0}
   userData: 
   assetBundleName: 

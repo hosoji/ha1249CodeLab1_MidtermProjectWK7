@@ -6,17 +6,22 @@ using UnityEngine.SceneManagement;
 
 public class LevelLoader : MonoBehaviour {
 
+	public Dictionary<string,string[]> difficultySorting = new Dictionary<string, string[]> ();
+
 	public float offsetX = 0;
 	public float offsetY = 0;
 
 	public string[] fileNames;
 	public static int levelNum;
 
+
 	// initializatize level
 	void Start () {
 
-		levelNum = Random.Range (0, 2);
-//		levelNum = 0;
+		difficultySorting.Add ("Easy", fileNames);
+
+
+		levelNum = Random.Range (0, fileNames.Length);
 		string fileName = fileNames[levelNum];
 
 		string filePath = Application.dataPath +"/"+ fileName;
